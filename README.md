@@ -1,6 +1,10 @@
 # awesome_climate_app
 
-A new Flutter project.
+This is A flutter based application powered by Live data using OpenWeatherAPI to show Weather forecast for current date.
+
+# Here is Some images for Application UI and functionality
+
+![alt text](assets/git_upload/sample.jpeg)
 
 ## Getting Started
 
