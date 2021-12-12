@@ -3,9 +3,61 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'networking.dart';
+
+Widget decideSvg(String icon) {
+  if (icon == 'Haze') {
+    return const FaIcon(
+      FontAwesomeIcons.smog,
+      color: Colors.black,
+      size: 40,
+    );
+  }
+  if (DateTime.now().hour >= 18) {
+    if (icon == 'Cloudy') {
+      return const FaIcon(
+        FontAwesomeIcons.cloudSun,
+        color: Colors.black,
+        size: 40,
+      );
+    } else if (icon == 'Clear') {
+      return const FaIcon(
+        FontAwesomeIcons.sun,
+        color: Colors.black,
+        size: 40,
+      );
+    } else {
+      return const FaIcon(
+        FontAwesomeIcons.cloud,
+        color: Colors.black,
+        size: 40,
+      );
+    }
+  }
+  if (icon == 'Cloudy') {
+    return const FaIcon(
+      FontAwesomeIcons.cloudMoon,
+      color: Colors.black,
+      size: 40,
+    );
+  } else if (icon == 'Clear') {
+    return const FaIcon(
+      FontAwesomeIcons.moon,
+      color: Colors.black,
+      size: 40,
+    );
+  }
+  return const FaIcon(
+    FontAwesomeIcons.cloud,
+    color: Colors.black,
+    size: 40,
+  );
+}
+
 Row bottomFields(String title, String value, FaIcon showIcon) {
   return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    mainAxisAlignment: MainAxisAlignment.start,
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       CircleAvatar(
         backgroundColor: const Color(0xFFDEDEDE),
@@ -15,7 +67,9 @@ Row bottomFields(String title, String value, FaIcon showIcon) {
       Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
           children: [
             Text(
               title,
@@ -26,7 +80,7 @@ Row bottomFields(String title, String value, FaIcon showIcon) {
             Text(
               value,
               style: GoogleFonts.recursive(
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
             )
@@ -37,19 +91,64 @@ Row bottomFields(String title, String value, FaIcon showIcon) {
   );
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
+Row bottomFieldsRight(String title, String value, FaIcon showIcon) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.end,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                color: Color(0xEAA3A3A3),
+              ),
+            ),
+            Text(
+              value,
+              style: GoogleFonts.recursive(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            )
+          ],
+        ),
+      ),
+      CircleAvatar(
+        backgroundColor: const Color(0xFFDEDEDE),
+        radius: 25.0,
+        child: showIcon,
+      ),
+    ],
+  );
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  late String temperature = 30.toString();
-  late String weather = "Mostly Clouds";
-  late String precipitation = 50.toString();
-  late String wind = "10";
-  late String humidity = "89";
+class MyHomePage extends StatefulWidget {
+  MyHomePage(
+      {required this.temperature,
+      required this.weather,
+      required this.pressure,
+      required this.wind,
+      required this.humidity,
+      required this.city,
+      required this.varyIcon});
+  late String varyIcon;
+  String temperature = 30.toString();
+  String weather = "Mostly Clouds";
+  String pressure = 50.toString();
+  String wind = "10";
+  String humidity = "89";
+  late String city;
+  @override
+  MyHomePageState createState() => MyHomePageState();
+}
+
+class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,11 +157,11 @@ class _MyHomePageState extends State<MyHomePage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            flex: 2,
+            flex: 5,
             child: Padding(
               padding: const EdgeInsets.only(top: 50, left: 10, right: 10),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Column(
@@ -71,12 +170,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            "Indore, Madhya Pradesh",
+                            widget.city,
                             style: GoogleFonts.rye(
                                 fontWeight: FontWeight.w600, fontSize: 17),
                           ),
                           Text(
-                            "Today, December 25 15:05",
+                            getDateFormatted(),
                             style: GoogleFonts.sourceSansPro(
                                 color: const Color(0xFF474747),
                                 fontWeight: FontWeight.w600,
@@ -94,28 +193,28 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           Column(
                             children: [
-                              const FaIcon(
-                                FontAwesomeIcons.cloudSun,
-                                color: Colors.black,
-                                size: 40,
-                              ),
+                              decideSvg(widget.varyIcon),
                               Text(
-                                weather,
-                                style: GoogleFonts.recursive(fontSize: 15),
+                                widget.weather,
+                                style: GoogleFonts.recursive(
+                                    fontSize: 18, fontWeight: FontWeight.w500),
                               )
                             ],
                           ),
                           Text(
-                            "$temperature°",
-                            style: const TextStyle(fontSize: 60,color: Color(
-                                0xFF284B87)),
+                            "${widget.temperature}°",
+                            style: const TextStyle(
+                                fontSize: 60, color: Color(0xFF284B87)),
                           )
                         ],
                       ),
                       const SizedBox(
                         height: 40,
                       ),
-                      SvgPicture.asset('assets/svg/day.svg',height: 150,)
+                      SvgPicture.asset(
+                        'assets/svg/front.svg',
+                        height: 150,
+                      )
                     ],
                   )
                 ],
@@ -123,7 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Expanded(
-              flex: 1,
+              flex: 2,
               child: Container(
                 decoration: BoxDecoration(
                   boxShadow: [
@@ -139,14 +238,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
                   ),
-
                 ),
                 height: 10,
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(15.0),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Center(
                         child: Text(
@@ -159,43 +257,56 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          bottomFields(
-                              "Feels like",
-                              "$temperature°",
-                              const FaIcon(
-                                FontAwesomeIcons.temperatureLow,
-                                color: Colors.black,
-                              )),
-                          bottomFields(
-                              "Wind",
-                              "$wind km/h",
-                              const FaIcon(
-                                FontAwesomeIcons.wind,
-                                color: Colors.black,
-                              ))
+                          Expanded(
+                            flex: 1,
+                            child: bottomFields(
+                                "Feels like",
+                                "${widget.temperature}°",
+                                const FaIcon(
+                                  FontAwesomeIcons.temperatureLow,
+                                  color: Colors.black,
+                                )),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: bottomFieldsRight(
+                                "Wind",
+                                "${widget.wind}km/h",
+                                const FaIcon(
+                                  FontAwesomeIcons.wind,
+                                  color: Colors.black,
+                                )),
+                          )
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          bottomFields(
-                              "Precipitation",
-                              "$precipitation%",
-                              const FaIcon(
-                                FontAwesomeIcons.umbrellaBeach,
-                                color: Colors.black,
-                              )),
-                          bottomFields(
-                              "Humidity",
-                              "$humidity%",
-                              const FaIcon(
-                                FontAwesomeIcons.tint,
-                                color: Colors.black,
-                              ))
+                          Expanded(
+                            flex: 1,
+                            child: bottomFields(
+                                "Pressure",
+                                widget.pressure,
+                                const FaIcon(
+                                  FontAwesomeIcons.umbrellaBeach,
+                                  color: Colors.black,
+                                )),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: bottomFieldsRight(
+                                "Humidity",
+                                "${widget.humidity}%",
+                                const FaIcon(
+                                  FontAwesomeIcons.tint,
+                                  color: Colors.black,
+                                )),
+                          )
                         ],
-                      ),
+                      )
                     ],
                   ),
                 ),
