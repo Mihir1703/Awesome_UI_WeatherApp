@@ -4,7 +4,11 @@ This is A flutter based application powered by Live data using OpenWeatherAPI to
 
 # Here is Some images for Application UI and functionality
 
-<img src="assets/git_upload/sample.jpeg" height="500">
+<div style="display:flex; justify-content:center;">
+  <img src="assets/git_upload/1.jpeg" height="500">
+  <img src="assets/git_upload/2.jpeg" height="500">
+  <img src="assets/git_upload/3.jpeg" height="500">
+</div>
 
 ## Getting Started
 
